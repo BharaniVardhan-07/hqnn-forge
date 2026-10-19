@@ -192,17 +192,24 @@ Beyond the protocol:
 
 ## A variational block (ansatz)
 
-**Reference:** `apply_variational_layers` in `hqnn_forge/encoding/_common.py`. The
-`"hardware_efficient"` branch, the most recent addition, is the example to copy: a primitive in
-`hqnn_forge/circuits/` applied once per layer, with a weight shape of its own. `"brickwork"`
-shows a block written inline, and `"strongly_entangling"` one that depends on the layer index.
+The functions in `hqnn_forge/circuits/` are the per-layer blocks the encoders run, selected by
+their `entangler` argument through `apply_variational_layers`. Note the naming wart:
+`strongly_entangling_layer` is `entangler="ring"` (not `"strongly_entangling"`, which is
+PennyLane's `qml.StronglyEntanglingLayers`) and `hardware_efficient_layer` is
+`entangler="hardware_efficient"`.
 
-The functions in `hqnn_forge/circuits/` are the per-layer blocks the encoders run, selected by their `entangler` argument through `apply_variational_layers`. Note the naming wart: `strongly_entangling_layer` is `entangler="ring"` (not `"strongly_entangling"`, which is PennyLane's `qml.StronglyEntanglingLayers`) and `hardware_efficient_layer` is `entangler="hardware_efficient"`. 
+The core of adding an ansatz is three steps; the sections below list the conventions, tests and
+other places to update:
 
-Adding an ansatz means three steps:
-1. Add a primitive to `hqnn_forge/circuits/`. A primitive alone has no effect on the models.
-2. Add a value to the `Entangler` literal. `mypy`'s `assert_never` in `apply_variational_layers` flags a new value the dispatch doesn't handle.
+1. Add a primitive to `hqnn_forge/circuits/` and export it from `hqnn_forge/circuits/__init__.py`
+   (the import, `__all__` and the docstring). A primitive alone has no effect on the models.
+2. Add a value to the `Entangler` literal and a branch for it in `apply_variational_layers` that
+   calls the primitive once per layer. mypy flags a value the dispatch doesn't handle, through
+   the `typing.assert_never` at its end.
 3. Add a branch to `variational_weight_shape` if its weights aren't `(n_layers, n_qubits, 3)`.
+   Nothing checks this now: an unhandled value silently gets that default shape.
+
+### Interface and conventions
 
 ### Interface and conventions
 
