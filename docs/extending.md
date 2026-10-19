@@ -197,12 +197,12 @@ Beyond the protocol:
 `hqnn_forge/circuits/` applied once per layer, with a weight shape of its own. `"brickwork"`
 shows a block written inline, and `"strongly_entangling"` one that depends on the layer index.
 
-The functions in `hqnn_forge/circuits/` are the per-layer blocks the encoders run:
-`strongly_entangling_layer` is `entangler="ring"` (not `"strongly_entangling"`, which is
-PennyLane's `qml.StronglyEntanglingLayers`) and `hardware_efficient_layer` is
-`entangler="hardware_efficient"`. The block the encoders use is selected by their `entangler`
-argument, so a new ansatz is a new primitive there plus a new `entangler` value; a primitive
-alone has no effect on the models.
+The functions in `hqnn_forge/circuits/` are the per-layer blocks the encoders run, selected by their `entangler` argument through `apply_variational_layers`. Note the naming wart: `strongly_entangling_layer` is `entangler="ring"` (not `"strongly_entangling"`, which is PennyLane's `qml.StronglyEntanglingLayers`) and `hardware_efficient_layer` is `entangler="hardware_efficient"`. 
+
+Adding an ansatz means three steps:
+1. Add a primitive to `hqnn_forge/circuits/`. A primitive alone has no effect on the models.
+2. Add a value to the `Entangler` literal. `mypy`'s `assert_never` in `apply_variational_layers` flags a new value the dispatch doesn't handle.
+3. Add a branch to `variational_weight_shape` if its weights aren't `(n_layers, n_qubits, 3)`.
 
 ### Interface and conventions
 
