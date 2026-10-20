@@ -192,6 +192,11 @@ Beyond the protocol:
 
 ## A variational block (ansatz)
 
+**Reference:** `apply_variational_layers` in `hqnn_forge/encoding/_common.py`. The
+`"hardware_efficient"` branch, the most recent addition, is the example to copy: a primitive in
+`hqnn_forge/circuits/` applied once per layer, with a weight shape of its own. `"brickwork"`
+shows a block written inline, and `"strongly_entangling"` one that depends on the layer index.
+
 The functions in `hqnn_forge/circuits/` are the per-layer blocks the encoders run, selected by
 their `entangler` argument through `apply_variational_layers`. Note the naming wart:
 `strongly_entangling_layer` is `entangler="ring"` (not `"strongly_entangling"`, which is
@@ -208,9 +213,6 @@ other places to update:
    the `typing.assert_never` at its end.
 3. Add a branch to `variational_weight_shape` if its weights aren't `(n_layers, n_qubits, 3)`.
    Nothing checks this now: an unhandled value silently gets that default shape.
-
-### Interface and conventions
-
 ### Interface and conventions
 
 - **Signature:** a block is applied as
