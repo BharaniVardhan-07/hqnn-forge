@@ -213,6 +213,7 @@ other places to update:
    the `typing.assert_never` at its end.
 3. Add a branch to `variational_weight_shape` if its weights aren't `(n_layers, n_qubits, 3)`.
    Nothing checks this now: an unhandled value silently gets that default shape.
+
 ### Interface and conventions
 
 - **Signature:** a block is applied as
